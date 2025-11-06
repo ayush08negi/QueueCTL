@@ -22,11 +22,11 @@
   {
     "id": "ee850381-a0a7-4102-b7ec-18e91430af01",
     "command": "{id:job1,command:echo Hello World}",
-    "status": "ready",
-    "retries": 0,
+    "status": "running",
+    "retries": 1,
     "maxRetries": 3,
     "backoffBase": 2,
-    "nextAttempt": 1762442267446,
+    "nextAttempt": 1762459991446,
     "createdAt": 1762442267446
   }
 ]

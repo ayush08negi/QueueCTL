@@ -7,7 +7,6 @@ function start() {
   const program = new Command();
   program.name('queuectl').description('CLI for queuectl job queue');
 
-  // 🟢 Enqueue command (JSON or string)
   program
     .command('enqueue <job>')
     .description('Add a new job to the queue')
@@ -17,7 +16,6 @@ function start() {
         try {
           jobData = JSON.parse(jobInput); // allow JSON
         } catch {
-          // fallback if just a command string
           jobData = { command: jobInput };
         }
         await queue.enqueue(jobData.command, jobData);
@@ -26,10 +24,8 @@ function start() {
       }
     });
 
-  // ⚙️ Worker commands
   const workerCmd = program.command('worker').description('Manage worker processes');
 
-  // ✅ supports: queuectl worker start --count 3
   workerCmd
     .command('start')
     .description('Start one or more workers')
@@ -41,7 +37,6 @@ function start() {
       }
     });
 
-  // run worker in foreground
   workerCmd
     .command('run')
     .description('Run worker in foreground (blocking)')
@@ -50,7 +45,6 @@ function start() {
       await worker.run(opts.id);
     });
 
-  // stop workers
   workerCmd
     .command('stop')
     .description('Stop all running workers gracefully')
@@ -58,7 +52,6 @@ function start() {
       await worker.stopAll();
     });
 
-  // 🧾 Status command
   program
     .command('status')
     .description('Show summary of all job states & active workers')
@@ -66,7 +59,6 @@ function start() {
       await queue.status();
     });
 
-  // 📋 List jobs
   program
     .command('list')
     .description('List jobs (optionally by state)')
@@ -75,7 +67,6 @@ function start() {
       await queue.list(opts);
     });
 
-  // ☠️ DLQ commands
   const dlq = program.command('dlq').description('Dead Letter Queue management');
 
   dlq
@@ -99,7 +90,6 @@ function start() {
       await queue.dlqClear();
     });
 
-  // ⚙️ Config commands
   const config = program.command('config').description('Manage configuration');
 
   config
