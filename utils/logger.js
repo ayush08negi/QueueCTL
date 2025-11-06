@@ -1,0 +1,1 @@
+function info(...a){console.log('[INFO]',...a)};function error(...a){console.error('[ERR]',...a)};module.exports={info,error};
