@@ -1,1 +1,4 @@
-{ "maxRetries": 3, "backoffBase": 2 }
+{
+  "maxRetries": 3,
+  "backoffBase": 2
+}

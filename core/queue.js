@@ -6,10 +6,28 @@ const logger = require('../utils/logger');
 const now = () => Date.now();
 
 
-async function enqueue(command) {
+async function enqueue(input) {
   try {
     const jobs = await filestore.read('jobs');
     const config = await filestore.read('config');
+
+    let command = input;
+
+    // Try to parse JSON if input looks like JSON, otherwise treat as plain command
+    if (typeof input === 'string' && input.trim().startsWith('{')) {
+      try {
+        const parsed = JSON.parse(input);
+        if (parsed.command) {
+          command = parsed.command;
+        }
+      } catch {
+        // Ignore invalid JSON — fallback to plain text
+        command = input;
+      }
+    }
+
+    command = command.replace(/^{|}$/g, '').trim();
+    command = command.replace(/command[:=]\s*/i, '').trim();
 
     const newJob = {
       id: uuidv4(),
@@ -19,17 +37,21 @@ async function enqueue(command) {
       maxRetries: config.maxRetries,
       backoffBase: config.backoffBase,
       nextAttempt: now(),
-      createdAt: now()
+      createdAt: now(),
     };
 
     jobs.push(newJob);
     await filestore.write('jobs', jobs);
 
-    logger.info(`Enqueued job ${newJob.id}: ${command}`);
+    logger.info(`Enqueued job ${newJob.id}: ${newJob.command}`);
   } catch (err) {
     console.error('Failed to enqueue job:', err.message);
   }
 }
+
+module.exports = {
+  enqueue,
+};
 
 
 async function list() {

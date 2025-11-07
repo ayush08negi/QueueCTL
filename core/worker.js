@@ -1,10 +1,11 @@
-
-const { exec, spawn } = require('child_process');
+const { exec } = require('child_process');
+const { spawn } = require('child_process');
 const path = require('path');
 const filestore = require('../utils/filestore');
 const logger = require('../utils/logger');
 const lock = require('../utils/lock');
-const queue = require('./queue');
+
+let shouldStop = false;
 
 async function startDetached() {
   try {
@@ -30,7 +31,7 @@ async function stopAll() {
   try {
     const pids = await filestore.read('pids');
     if (!pids.length) {
-      console.log('No active workers found.');
+      console.log('No active workers running.');
       return;
     }
 
@@ -51,12 +52,15 @@ async function stopAll() {
 
 async function run() {
   console.log('[Worker] Started and waiting for jobs...');
-  let shuttingDown = false;
 
-  process.on('SIGINT', () => (shuttingDown = true));
-  process.on('SIGTERM', () => (shuttingDown = true));
+  process.on('SIGINT', () => {
+    shouldStop = true;
+  });
+  process.on('SIGTERM', () => {
+    shouldStop = true;
+  });
 
-  while (!shuttingDown) {
+  while (!shouldStop) {
     const jobs = await filestore.read('jobs');
     const job = jobs.find(j => j.status === 'ready' && j.nextAttempt <= Date.now());
 
@@ -78,10 +82,14 @@ async function run() {
         console.log(`[Worker] Job ${job.id} failed: ${stderr || err.message}`);
 
         job.retries++;
+
         if (job.retries > job.maxRetries) {
-          console.log(`[Worker] Job ${job.id} moved to DLQ (max retries reached).`);
+          console.log(`[Worker] Job ${job.id} moved to DLQ after ${job.maxRetries} retries.`);
+
           const dlq = await filestore.read('dlq');
+          job.status = 'dlq';
           dlq.push(job);
+
           await filestore.write('dlq', dlq);
           await filestore.write('jobs', jobs.filter(j => j.id !== job.id));
         } else {
@@ -92,7 +100,8 @@ async function run() {
           console.log(`[Worker] Retrying job ${job.id} in ${delay}s...`);
         }
       } else {
-        console.log(`[Worker] Job ${job.id} succeeded: ${stdout ? stdout.trim() : ''}`);
+        const result = stdout ? stdout.trim() : '';
+        console.log(`[Worker] Job ${job.id} succeeded: ${result}`);
         await filestore.write('jobs', jobs.filter(j => j.id !== job.id));
       }
 

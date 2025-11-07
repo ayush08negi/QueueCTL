@@ -1,32 +1,12 @@
 [
   {
-    "id": "f01e4169-8c4c-47a1-962c-341166a80a76",
-    "command": "echo Hello",
-    "status": "running",
+    "id": "b9629606-da2f-41a6-99a3-bd13758f72e9",
+    "command": "echo Hello Queue",
+    "status": "ready",
     "retries": 0,
     "maxRetries": 3,
     "backoffBase": 2,
-    "nextAttempt": 1762436515754,
-    "createdAt": 1762436515754
-  },
-  {
-    "id": "5256adfe-52a7-4e87-8a9d-82940f8d395c",
-    "command": "{id:job1,command:echo Hello}",
-    "status": "running",
-    "retries": 0,
-    "maxRetries": 3,
-    "backoffBase": 2,
-    "nextAttempt": 1762442026249,
-    "createdAt": 1762442026249
-  },
-  {
-    "id": "ee850381-a0a7-4102-b7ec-18e91430af01",
-    "command": "{id:job1,command:echo Hello World}",
-    "status": "running",
-    "retries": 1,
-    "maxRetries": 3,
-    "backoffBase": 2,
-    "nextAttempt": 1762459991446,
-    "createdAt": 1762442267446
+    "nextAttempt": 1762524275306,
+    "createdAt": 1762524275306
   }
 ]

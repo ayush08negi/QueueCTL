@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "bf8d5b71-62c3-4999-88ef-0d1c43daa4a5",
+    "command": "invalidCommand",
+    "status": "dlq",
+    "retries": 4,
+    "maxRetries": 3,
+    "backoffBase": 2,
+    "nextAttempt": 1762524079700,
+    "createdAt": 1762524051964
+  }
+]
